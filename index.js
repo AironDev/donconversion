@@ -32,8 +32,8 @@ module.exports.handler = async (event, context) => {
   }
 
   var body = "";
-  //S3 put events
-  body = 'example.docx';
+  //S3 put event
+  body = event.Records[0].body;
   console.log('s3 bucket file name from event:', body);
 
   // get file from s3 bucket
