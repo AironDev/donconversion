@@ -11,7 +11,7 @@ const inputPath = path.join( '/opt', 'lo.tar.br');
 const outputPath = '/tmp/';
 const bucketName = 'authoran-files';
 
-module.exports.handler = async event => {
+module.exports.handler = async (event, context) => {
   console.log(execSync('ls -alh /opt').toString('utf8'));
 
   try {
@@ -32,67 +32,68 @@ module.exports.handler = async event => {
   }
 
   var body = "";
+  console.log(event)
   //S3 put event
-  body = event.Records[0].body; 
-  console.log('s3 bucket file name from event:', body);
+  // body = event.Records[0].body;
+  // console.log('s3 bucket file name from event:', body);
 
   // get file from s3 bucket
-  var s3fileName = body;
-  var newFileName = Date.now()+'.pdf';
-  var s3 = new AWS.S3({apiVersion: '2006-03-01'});
-  var fileStream = fs.createWriteStream('/tmp/'+s3fileName);
+  // var s3fileName = body;
+  // var newFileName = Date.now()+'.pdf';
+  // var s3 = new AWS.S3({apiVersion: '2006-03-01'});
+  // var fileStream = fs.createWriteStream('/tmp/'+s3fileName);
 
-  var getObject = function(keyFile) {
-      return new Promise(function(success, reject) {
-          s3.getObject(
-              { Bucket: bucketName, Key: keyFile },
-              function (error, data) {
-                  if(error) {
-                      reject(error);
-                  } else {
-                      success(data);
-                  }
-              }
-          );
-      });
-  }
+  // var getObject = function(keyFile) {
+  //     return new Promise(function(success, reject) {
+  //         s3.getObject(
+  //             { Bucket: bucketName, Key: keyFile },
+  //             function (error, data) {
+  //                 if(error) {
+  //                     reject(error);
+  //                 } else {
+  //                     success(data);
+  //                 }
+  //             }
+  //         );
+  //     });
+  // }
 
-  let fileData = await getObject(s3fileName);
-    try{  
-      fs.writeFileSync('/tmp/'+s3fileName, fileData.Body);
-    } catch(err) {
-      // An error occurred
-      console.error('file write:', err);
-    }
+  // let fileData = await getObject(s3fileName);
+  //   try{  
+  //     fs.writeFileSync('/tmp/'+s3fileName, fileData.Body);
+  //   } catch(err) {
+  //     // An error occurred
+  //     console.error('file write:', err);
+  //   }
 
-    const convertCommand = `export HOME=/tmp && /tmp/lo/instdir/program/soffice.bin --headless --norestore --invisible --nodefault --nofirststartwizard --nolockcheck --nologo --convert-to "pdf:writer_pdf_Export" --outdir /tmp /tmp/${s3fileName}`;
-    try {
-      console.log(execSync(convertCommand).toString('utf8'));
-    } catch (e) {
-      console.log(execSync(convertCommand).toString('utf8'));
-    }
-    console.log(execSync('ls -alh /tmp').toString('utf8'));
+  //   const convertCommand = `export HOME=/tmp && /tmp/lo/instdir/program/soffice.bin --headless --norestore --invisible --nodefault --nofirststartwizard --nolockcheck --nologo --convert-to "pdf:writer_pdf_Export" --outdir /tmp /tmp/${s3fileName}`;
+  //   try {
+  //     console.log(execSync(convertCommand).toString('utf8'));
+  //   } catch (e) {
+  //     console.log(execSync(convertCommand).toString('utf8'));
+  //   }
+  //   console.log(execSync('ls -alh /tmp').toString('utf8'));
 
-    function uploadFile(buffer, fileName) {
-     return new Promise((resolve, reject) => {
-      s3.putObject({
-       Body: buffer,
-       Key: fileName,
-       Bucket: bucketName,
-      }, (error) => {
-       if (error) {
-        reject(error);
-       } else {
+  //   function uploadFile(buffer, fileName) {
+  //    return new Promise((resolve, reject) => {
+  //     s3.putObject({
+  //      Body: buffer,
+  //      Key: fileName,
+  //      Bucket: bucketName,
+  //     }, (error) => {
+  //      if (error) {
+  //       reject(error);
+  //      } else {
 
-        resolve(fileName);
-       }
-      });
-     });
-    }
+  //       resolve(fileName);
+  //      }
+  //     });
+  //    });
+  //   }
 
 
-    let fileParts = s3fileName.substr(0, s3fileName.lastIndexOf(".")) + ".pdf";
-    let fileB64data = fs.readFileSync('/tmp/'+fileParts);
-    await uploadFile(fileB64data, 'pdf/'+fileParts);
-    console.log('new pdf converted and uploaded!!!');
+  //   let fileParts = s3fileName.substr(0, s3fileName.lastIndexOf(".")) + ".pdf";
+  //   let fileB64data = fs.readFileSync('/tmp/'+fileParts);
+  //   await uploadFile(fileB64data, 'pdf/'+fileParts);
+  //   console.log('new pdf converted and uploaded!!!');
 };
