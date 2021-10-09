@@ -35,11 +35,12 @@ module.exports.handler = async (event, context) => {
   console.log(event)
   // S3 put event
   // body = event.Records[0].body;
-  body = 'example.docx';
-  console.log('s3 bucket file name from event:', body);
+  // body = 'example.docx';
+  const filename = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
+  console.log('s3 bucket file name from event:', filename);
 
   // get file from s3 bucket
-  var s3fileName = body;
+  var s3fileName = filename;
   var newFileName = Date.now()+'.pdf';
   var s3 = new AWS.S3({apiVersion: '2006-03-01'});
   var fileStream = fs.createWriteStream('/tmp/'+s3fileName);
