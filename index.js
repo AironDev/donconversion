@@ -32,7 +32,7 @@ module.exports.handler = async (event, context) => {
   }
 
   var body = "";
-  //S3 put event
+  //S3 put events
   body = 'example.docx';
   console.log('s3 bucket file name from event:', body);
 
