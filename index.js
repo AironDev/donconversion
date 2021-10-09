@@ -11,7 +11,7 @@ const inputPath = path.join( '/opt', 'lo.tar.br');
 const outputPath = '/tmp/';
 const bucketName = 'authoran-files';
 
-module.exports.handler = async (event, context) => {
+module.exports.handler = async event => {
   console.log(execSync('ls -alh /opt').toString('utf8'));
 
   try {
@@ -33,7 +33,7 @@ module.exports.handler = async (event, context) => {
 
   var body = "";
   //S3 put event
-  body = event.Records[0].body;
+  body = event.Records[0].body; 
   console.log('s3 bucket file name from event:', body);
 
   // get file from s3 bucket
